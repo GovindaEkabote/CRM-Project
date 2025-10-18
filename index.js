@@ -14,10 +14,8 @@ app.use(helmet());
 app.use(cors());
 app.use(morgan("dev"));
 
-// Routes
-app.get("/", (req, res) => {
-  res.json({ message: "Server is up and running 🚀" });
-});
+const authRoute = require('./routes/auth.routes')
+app.use('/hrm/api/v1',authRoute)
 
 // Error Handling
 app.use((err, req, res, next) => {
