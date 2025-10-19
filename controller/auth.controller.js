@@ -1,41 +1,34 @@
 const User = require("../models/user.model");
+const constant = require("../utils/constant");
 const bcrypt = require("bcryptjs");
 
 // SignUp : EMPLOYEE = Approved by default | ADMIN/IT_SUPPORT = Pending
 exports.signUp = async (req, res) => {
   try {
-    const { name, empId, email, password, userType } = req.body;
+    let { name, empId, email, password, userType } = req.body;
 
     // Validate required fields
     if (!name || !empId || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Check duplicate users
-    const existingUser = await User.findOne({
-      $or: [{ email }, { empId }],
-    });
+    // Check for duplicates
+    const existingUser = await User.findOne({ $or: [{ email }, { empId }] });
     if (existingUser) {
-      return res
-        .status(409)
-        .json({ message: "User with given email or empId already exists" });
+      return res.status(409).json({ message: "User with given email or empId already exists" });
     }
 
-    // Determine status
-    let userStatus = "PENDING";
-    let finalUserType = "EMPLOYEE";
+    // Determine role & status
+    const finalUserType = userType || constant.userType.employee;
+    const userStatus =
+      finalUserType === constant.userType.employee
+        ? constant.userStatus.approved
+        : constant.userStatus.pending;
 
-    if (!userType || userType === "EMPLOYEE") {
-      userStatus = "APPROVED";
-    } else if (["ADMIN", "IT_SUPPORT"].includes(userType)) {
-      finalUserType = userType;
-      userStatus = "PENDING";
-    }
+    // Hash password asynchronously
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Hash password
-    const hashedPassword = bcrypt.hashSync(password, 10);
-
-    // Create user
+    // Create new user
     const newUser = await User.create({
       name,
       empId,
@@ -45,7 +38,6 @@ exports.signUp = async (req, res) => {
       userStatus,
     });
 
-    // Return safe response
     res.status(201).json({
       success: true,
       message: "User created successfully",
@@ -60,16 +52,9 @@ exports.signUp = async (req, res) => {
     });
   } catch (error) {
     console.error("Error while creating user:", error);
-
     if (error.code === 11000) {
-      return res
-        .status(409)
-        .json({ message: "User with given email or empId already exists" });
+      return res.status(409).json({ message: "User with given email or empId already exists" });
     }
-
-    res.status(500).json({
-      message: "Internal server error while creating the user",
-    });
+    res.status(500).json({ message: "Internal server error while creating the user" });
   }
 };
-
