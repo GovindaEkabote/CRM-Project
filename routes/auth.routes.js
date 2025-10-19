@@ -8,9 +8,8 @@ route.post(
   [validateUserRequestBody.validateUserReqBody],
   authController.signUp
 );
-route.get(
-  "/auth/login",
-  authController.login
-);
+route.get("/auth/login", authController.login);
+
+route.get("/auth/logout", authController.logout);
 
 module.exports = route;

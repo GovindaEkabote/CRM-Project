@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const constant = require("../utils/constant");
+const Token = require("../models/token.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
@@ -97,23 +98,35 @@ exports.login = async (req, res) => {
       });
     }
 
-    // Ensure environment variables exist
-    if (!process.env.SECRET || !process.env.EXPIRES_IN) {
-      console.error(
-        "JWT SECRET or EXPIRES_IN not set in environment variables"
-      );
-      return res.status(500).json({
-        success: false,
-        message: "Server misconfiguration. Please contact admin.",
-      });
-    }
-
-    // Generate JWT
-    const token = jwt.sign(
+    // Generate tokens
+    const accessToken = jwt.sign(
       { id: user._id, empId: user.empId, role: user.userType },
       process.env.SECRET,
       { expiresIn: process.env.EXPIRES_IN }
     );
+
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_SECRET,
+      { expiresIn: process.env.REFRESH_EXPIRES_IN }
+    );
+
+    // Save refresh token in DB
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    await Token.create({ userId: user._id, refreshToken, expiresAt });
+
+    // Set cookies (httpOnly, secure, sameSite)
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      sameSite: "Strict",
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
 
     // Success response
     return res.status(200).json({
@@ -125,7 +138,6 @@ exports.login = async (req, res) => {
         email: user.email,
         userType: user.userType,
         userStatus: user.userStatus,
-        accessToken: token,
       },
     });
   } catch (error) {
@@ -133,6 +145,42 @@ exports.login = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error during login.",
+    });
+  }
+};
+
+exports.logout = async (req, res) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: "No refersh token found",
+      });
+    }
+    await Token.findOneAndDelete({ refreshToken });
+
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      sameSite: "strict",
+      path: "/",
+    });
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      sameSite: "strict",
+      path: "/",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Logout successful. Tokens cleared.",
+    });
+  } catch (error) {
+    console.error("Error during logout:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error during logout.",
     });
   }
 };

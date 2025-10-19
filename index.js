@@ -5,11 +5,13 @@ const helmet = require("helmet");
 const cors = require("cors");
 const morgan = require("morgan");
 const initAdmin = require("./utils/initAdmin");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 
 
 // Middleware
+app.use(cookieParser());
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
