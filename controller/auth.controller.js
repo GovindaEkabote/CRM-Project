@@ -184,3 +184,58 @@ exports.logout = async (req, res) => {
     });
   }
 };
+
+exports.refreshToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    if (!refreshToken) {
+      return res.status(400).json({
+        success: false,
+        message: "Refresh token missing.",
+      });
+    }
+
+    const storedToken = await Token.findOne({ refreshToken });
+    if (!storedToken) {
+      return res.status(403).json({
+        success: false,
+        message: "Invalid or expired refresh token.",
+      });
+    }
+
+    jwt.verify(refreshToken, process.env.REFRESH_SECRET, (err, decoded) => {
+      if (err) {
+        Token.deleteOne({ refreshToken });
+        return res.status(403).json({
+          success: false,
+          message: "Refresh token expired or invalid.",
+        });
+      }
+
+      const newAccessToken = jwt.sign(
+        { id: decoded.id },
+        process.env.SECRET,
+        { expiresIn: process.env.EXPIRES_IN }
+      );
+
+      // Replace cookie
+      res.cookie("accessToken", newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "Strict",
+        maxAge: 15 * 60 * 1000,
+      });
+
+      return res.status(200).json({
+        success: true,
+        message: "Access token refreshed successfully.",
+      });
+    });
+  } catch (error) {
+    console.error("Error during refresh:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error during refresh.",
+    });
+  }
+};

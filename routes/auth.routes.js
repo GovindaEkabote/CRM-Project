@@ -10,6 +10,9 @@ route.post(
 );
 route.get("/auth/login", authController.login);
 
-route.get("/auth/logout", authController.logout);
+route.post("/auth/logout", authController.logout);
+
+route.post("/auth/refresh", authController.refreshToken);
+
 
 module.exports = route;
