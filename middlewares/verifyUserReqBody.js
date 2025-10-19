@@ -1,41 +1,64 @@
 const User = require("../models/user.model");
-const 
+const constant = require("../utils/constant");
 
-validateUserRequestBody = async (req, res, next) => {
-  if (req.body.name) {
-    res.status(400).send({
-      message: "Failed ! Bad Request, UserName field is not passed or empty",
+const validateUserRequestBody = async (req, res, next) => {
+  const { name, empId, email, password, userType } = req.body;
+
+  // Validate required fields
+  if (!name || name.trim() === "") {
+    return res.status(400).send({
+      message: "Failed! Bad Request — 'name' field is required.",
     });
-    return;
   }
-// ------------------------------------------------------------------------
-  if (req.body.empId) {
-    res.status(400).send({
-      message: "Failed ! Bad Request, empId field is not passed or empty",
+
+  if (!empId || empId.trim() === "") {
+    return res.status(400).send({
+      message: "Failed! Bad Request — 'empId' field is required.",
     });
-    return;
   }
-  const user = await User.findOne({ empId: req.body.empId });
-  if (user != null) {
-    res.status(400).send({
-      message: "Failed ! Bad Request, empId field is already present",
+
+  const existingUserByEmpId = await User.findOne({ empId });
+  if (existingUserByEmpId) {
+    return res.status(400).send({
+      message: "Failed! Bad Request — 'empId' already exists.",
     });
-    return;
   }
-// ------------------------------------------------------------------------
-   if (req.body.email) {
-    res.status(400).send({
-      message: "Failed ! Bad Request, email field is not passed or empty",
+
+  if (!email || email.trim() === "") {
+    return res.status(400).send({
+      message: "Failed! Bad Request — 'email' field is required.",
     });
-    return;
   }
-  const userEmail = await User.findOne({ email: req.body.email });
-  if (userEmail != null) {
-    res.status(400).send({
-      message: "Failed ! Bad Request, email field is already present",
+
+  const existingUserByEmail = await User.findOne({ email });
+  if (existingUserByEmail) {
+    return res.status(400).send({
+      message: "Failed! Bad Request — 'email' already exists.",
     });
-    return;
   }
-// ------------------------------------------------------------------------
-const possibleUserTypes = []
+
+  if (!password || password.trim() === "") {
+    return res.status(400).send({
+      message: "Failed! Bad Request — 'password' field is required.",
+    });
+  }
+
+  // Validate userType (optional but must be valid if present)
+  const validUserTypes = [
+    constant.userType.employee,
+    constant.userType.ADMIN,
+    constant.userType.IT_SUPPORT,
+  ];
+
+  if (userType && !validUserTypes.includes(userType)) {
+    return res.status(400).send({
+      message: "Invalid 'userType' value. Please provide a valid one.",
+    });
+  }
+
+  next();
+};
+
+module.exports = {
+  validateUserReqBody: validateUserRequestBody,
 };
