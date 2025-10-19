@@ -19,7 +19,12 @@ app.use(cors());
 app.use(morgan("dev"));
 
 const authRoute = require('./routes/auth.routes')
+const user = require('./routes/user.routes')
+
 app.use('/hrm/api/v1',authRoute)
+app.use('/hrm/api/v1',user)
+
+
 
 // Error Handling
 app.use((err, req, res, next) => {
