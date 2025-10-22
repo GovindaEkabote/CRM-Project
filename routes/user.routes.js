@@ -5,5 +5,6 @@ const route = express.Router();
 
 
 route.get('/users',verifyToken,isAdmin,Users.findAll)
+route.get('/me',verifyToken,Users.user)
 
 module.exports = route;
