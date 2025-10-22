@@ -1,9 +1,9 @@
 const express = require('express')
 const Users = require('../controller/user.controller')
-const authjwt = require('../middlewares/authjwt')
+const {verifyToken,isAdmin} = require('../middlewares/authjwt')
 const route = express.Router();
 
 
-route.get('/users',authjwt,Users.findAll)
+route.get('/users',verifyToken,isAdmin,Users.findAll)
 
 module.exports = route;

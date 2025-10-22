@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const constant = require("../utils/constant");
 
 const verifyToken = (req, res, next) => {
   try {
@@ -7,7 +8,7 @@ const verifyToken = (req, res, next) => {
     if (!token) {
       return res.status(403).json({
         success: false,
-        message: "No access token provided.",
+        message: "No access token provided. Please login",
       });
     }
 
@@ -30,4 +31,30 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-module.exports = verifyToken;
+const isAdmin = (req, res, next) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized. Token is not verified",
+      });
+    }
+
+    if (req.user.userType !== constant.userType.ADMIN) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admins only.",
+      });
+    }
+
+    next();
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};
+
+// ✅ Correct export
+module.exports = { verifyToken, isAdmin };

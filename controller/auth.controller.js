@@ -100,7 +100,7 @@ exports.login = async (req, res) => {
 
     // Generate tokens
     const accessToken = jwt.sign(
-      { id: user._id, empId: user.empId, role: user.userType },
+      { id: user._id, empId: user.empId, userType: user.userType },
       process.env.SECRET,
       { expiresIn: process.env.EXPIRES_IN }
     );
