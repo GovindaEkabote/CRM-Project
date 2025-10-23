@@ -8,12 +8,12 @@ exports.findAll = async (req, res) => {
     let userStatusReq = req.query.userStatus;
     const queryObj = {};
 
-    if(userStatusReq){
-      queryObj.userStatus = userStatusReq
+    if (userStatusReq) {
+      queryObj.userStatus = userStatusReq;
     }
 
-    if(userTypeReq){
-      queryObj.userType = userTypeReq
+    if (userTypeReq) {
+      queryObj.userType = userTypeReq;
     }
     const users = await User.find(queryObj);
 
@@ -96,3 +96,50 @@ exports.getSingleEmployee = async (req, res) => {
     });
   }
 };
+
+exports.updateUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required.",
+      });
+    }
+
+    // Prepare update object safely
+    const updateFields = {};
+    const allowedFields = ["name", "email", "userType", "userStatus"];
+
+    allowedFields.forEach((field) => {
+      if (req.body[field] !== undefined) updateFields[field] = req.body[field];
+    });
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
+      new: true, // return updated document
+      runValidators: true, // enforce schema validation
+      select: "-password", // exclude password field from response
+    });
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Employee updated successfully.",
+      data: updatedUser,
+    });
+  } catch (error) {
+    console.error("Error updating employee:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while updating employee.",
+    });
+  }
+};
+
