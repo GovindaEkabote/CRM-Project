@@ -1,5 +1,6 @@
 const User = require("../models/user.model");
 const { userResp } = require("../utils/objectConverter");
+const constant = require("../utils/constant");
 
 exports.findAll = async (req, res) => {
   try {
@@ -42,6 +43,44 @@ exports.user = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: "Internal server error in findAll controller file",
+    });
+  }
+};
+
+exports.getSingleEmployee = async (req, res) => {
+  try {
+    if (!req.user || !req.user.userType !== constant.userType.ADMIN) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Admin only.",
+      });
+    }
+
+    const { empId } = req.params;
+    if (!empId) {
+      return res.status(400).json({
+        success: false,
+        message: "User Not Found",
+      });
+    }
+    const employee = await User.findOne().select("-password");
+    if (!employee) {
+      return res.status(400).json({
+        success: false,
+        message: `No employee found with ID ${empId}`,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Employee profile fetched successfully.",
+      data: employee,
+    });
+  } catch (error) {
+    console.error("Error fetching employee:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching employee.",
     });
   }
 };
