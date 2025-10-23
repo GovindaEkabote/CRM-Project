@@ -4,7 +4,19 @@ const constant = require("../utils/constant");
 
 exports.findAll = async (req, res) => {
   try {
-    const users = await User.find(); // MongoDB uses find(), not findAll()
+    let userTypeReq = req.query.userType;
+    let userStatusReq = req.query.userStatus;
+    const queryObj = {};
+
+    if(userStatusReq){
+      queryObj.userStatus = userStatusReq
+    }
+
+    if(userTypeReq){
+      queryObj.userType = userTypeReq
+    }
+    const users = await User.find(queryObj);
+
     return res.status(200).json({
       success: true,
       data: userResp(users),
