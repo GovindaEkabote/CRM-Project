@@ -1,25 +1,36 @@
 const User = require("../models/user.model");
 const { userResp } = require("../utils/objectConverter");
+const paginate = require("../utils/pagination");
 const constant = require("../utils/constant");
 
 exports.findAll = async (req, res) => {
   try {
-    let userTypeReq = req.query.userType;
-    let userStatusReq = req.query.userStatus;
+    const { userType, userStatus, search, page, limit } = req.query;
     const queryObj = {};
-
-    if (userStatusReq) {
-      queryObj.userStatus = userStatusReq;
+    if (userType) {
+      queryObj.userType = userType;
     }
-
-    if (userTypeReq) {
-      queryObj.userType = userTypeReq;
+    if (userStatus) {
+      queryObj.userStatus = userStatus;
     }
-    const users = await User.find(queryObj);
-
+    if (search) {
+      queryObj.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } },
+        { empId: { $regex: search, $options: "i" } },
+      ];
+    }
+    const result = await paginate(User, queryObj, {
+      page,
+      limit,
+      select: "-password -__v",
+      sort: { createdAt: -1 },
+    });
     return res.status(200).json({
       success: true,
-      data: userResp(users),
+      message: "Users fetched successfully.",
+      pagination: result.pagination,
+      data: userResp(result.data),
     });
   } catch (error) {
     console.error("Error fetching users:", error);
@@ -142,4 +153,3 @@ exports.updateUser = async (req, res) => {
     });
   }
 };
-
