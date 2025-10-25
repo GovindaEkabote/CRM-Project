@@ -13,5 +13,6 @@ route.post(
 );
 
 route.get("/tickets", verifyToken, Ticket.getAllTickets);
+route.get("/ticket/:ticketId", verifyToken, Ticket.getTicketById);
 
 module.exports = route;

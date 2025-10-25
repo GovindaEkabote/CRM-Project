@@ -52,7 +52,7 @@ exports.getAllTickets = async (req, res) => {
       filter = {};
     } else if (role === constant.userType.IT_SUPPORT) {
       filter = {
-        $or: [{ assignee: empId }, { assignee: null }],
+        $or: [{ assignee: empId }],
       };
     } else if (role === constant.userType.employee) {
       filter = { reporter: empId };
@@ -75,6 +75,62 @@ exports.getAllTickets = async (req, res) => {
     });
   } catch (error) {
     onsole.error("Error fetching tickets:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+// Get Ticket by ID..
+exports.getTicketById = async (req, res) => {
+  try {
+    const { ticketId } = req.params;
+    const empId = req.user.id || req.user._id;
+    const role = req.user.userType;
+    const ticket = await Ticket.findById(ticketId)
+      .populate("reporter", "fullName email empId")
+      .populate("assignee", "fullName email empId");
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket Not found",
+      });
+    }
+    if (role === constant.userType.ADMIN) {
+      return res.status(200).json({ success: true, data: ticket });
+    }
+    if (role === constant.userType.IT_SUPPORT) {
+      if (
+        ticket.assignee &&
+        ticket.assignee._id.toString() === empId.toString()
+      ) {
+        return res.status(200).json({ success: true, data: ticket });
+      }
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Ticket not assigned to you.",
+      });
+    }
+    if (role === constant.userType.employee) {
+      if (
+        ticket.reporter &&
+        ticket.reporter._id.toString() === empId.toString()
+      ) {
+        return res.status(200).json({ success: true, data: ticket });
+      }
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. You can view only your own tickets.",
+      });
+    }
+    return res.status(403).json({
+      success: false,
+      message: "Invalid user role.",
+    });
+  } catch (error) {
+    console.error("Error fetching ticket by ID:", error);
     return res.status(500).json({
       success: false,
       message: "Internal server error",
