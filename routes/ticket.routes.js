@@ -14,5 +14,6 @@ route.post(
 
 route.get("/tickets", verifyToken, Ticket.getAllTickets);
 route.get("/ticket/:ticketId", verifyToken, Ticket.getTicketById);
+route.put("/ticket/:ticketId", verifyToken, Ticket.updateTicketById);
 
 module.exports = route;
