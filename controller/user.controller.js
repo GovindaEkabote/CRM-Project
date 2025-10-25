@@ -153,3 +153,32 @@ exports.updateUser = async (req, res) => {
     });
   }
 };
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const { empId } = req.params;
+    if (!empId) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee ID Not Found",
+      });
+    }
+    const deleteUser = await User.findByIdAndDelete(empId);
+    if (!deleteUser) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee Not Found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Employee deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting employee", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while deleting user.",
+    });
+  }
+};

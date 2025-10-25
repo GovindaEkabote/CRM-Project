@@ -20,4 +20,6 @@ route.put(
   Users.updateUser
 );
 
+route.delete("/delete/:empId", verifyToken, isAdmin, Users.deleteUser);
+
 module.exports = route;
