@@ -20,9 +20,11 @@ app.use(morgan("dev"));
 
 const authRoute = require('./routes/auth.routes')
 const user = require('./routes/user.routes')
+const ticket = require('./routes/ticket.routes')
 
 app.use('/hrm/api/v1',authRoute)
 app.use('/hrm/api/v1',user)
+app.use('/hrm/api/v1',ticket)
 
 
 

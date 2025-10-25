@@ -103,5 +103,5 @@ const validateUserStatusAndUserType = (req, res, next) => {
 
 module.exports = {
   validateUserReqBody: validateUserRequestBody,
-  validateUserStatusAndUserType:validateUserStatusAndUserType
+  validateUserStatusAndUserType: validateUserStatusAndUserType,
 };
