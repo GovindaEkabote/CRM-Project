@@ -1,5 +1,6 @@
 const Ticket = require("../models/ticket.model");
 const constant = require("../utils/constant");
+const User = require('../models/user.model')
 
 // Employee raises a new ticket..
 exports.createTicket = async (req, res) => {
@@ -268,4 +269,85 @@ exports.deleteTicket = async (req, res) => {
   }
 };
 
+// ADMIN to assign any IT_SUPPORT staff || IT_SUPPORT to self-assign a ticket if it’s unassigned. || Prevent EMPLOYEE from assigning.
+exports.assignTicket = async (req, res) => {
+  try {
+    const { ticketId } = req.params;
+    const assignId = req.body?.assignId; // safe optional chaining
+    const empId = req.user._id || req.user.id;
+    const role = req.user.userType;
+
+    // 1. Find ticket
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket not found",
+      });
+    }
+
+    // 2. ADMIN assigns to IT_SUPPORT
+    if (role === constant.userType.ADMIN) {
+      if (!assignId) {
+        return res.status(400).json({
+          success: false,
+          message: "Admin must provide 'assignId' to assign a ticket.",
+        });
+      }
+
+      const itSupportUser = await User.findOne({
+        _id: assignId, // 🔥 use _id (not id)
+        userType: constant.userType.IT_SUPPORT,
+      });
+
+      if (!itSupportUser) {
+        return res.status(400).json({
+          success: false,
+          message: "Provided user is not a valid IT_SUPPORT staff.",
+        });
+      }
+
+      ticket.assignee = assignId;
+      await ticket.save();
+
+      return res.status(200).json({
+        success: true,
+        message: `Ticket assigned to ${itSupportUser.fullName || itSupportUser.name}`,
+        data: ticket,
+      });
+    }
+
+    // 3. IT_SUPPORT self-assign
+    if (role === constant.userType.IT_SUPPORT) {
+      if (ticket.assignee) {
+        return res.status(400).json({
+          success: false,
+          message: "Ticket is already assigned.",
+        });
+      }
+
+      ticket.assignee = empId;
+      await ticket.save();
+
+      return res.status(200).json({
+        success: true,
+        message: "Ticket successfully self-assigned.",
+        data: ticket,
+      });
+    }
+
+    // 4. EMPLOYEE access denied
+    return res.status(403).json({
+      success: false,
+      message: "Access denied. Only ADMIN or IT_SUPPORT can assign tickets.",
+    });
+  } catch (error) {
+    console.error("Error assigning ticket:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
 
