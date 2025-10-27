@@ -214,4 +214,58 @@ exports.updateTicketById = async (req, res) => {
   }
 };
 
-// https://chatgpt.com/c/68f6ccca-4290-8320-a20a-6820e5c643a0
+exports.deleteTicket = async (req, res) => {
+  try {
+    const { ticketId } = req.params;
+    const empId = req.user._id || req.user.id;
+    const role = req.user.userType;
+
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket Not Found",
+      });
+    }
+    if (role === constant.userType.ADMIN) {
+      await Ticket.findByIdAndDelete(ticketId);
+      return res.status(200).json({
+        success: true,
+        message: "Ticket deleted successfully by Admin.",
+      });
+    }
+    if (role === constant.userType.employee) {
+      if (ticket.reporter.toString() === empId.toString()) {
+        if (ticket.assignee) {
+          return res.status(400).json({
+            success: false,
+            message: "Cannot delete ticket once it is assigned to IT_SUPPORT.",
+          });
+        }
+        await Ticket.findByIdAndDelete(ticketId);
+        return res.status(200).json({
+          success: true,
+          message: "Your ticket has been deleted successfully.",
+        });
+      }
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. You can only delete your own tickets.",
+      });
+    }
+    // IT_SUPPORT or others
+    return res.status(403).json({
+      success: false,
+      message: "Access denied. You are not allowed to delete tickets.",
+    });
+  } catch (error) {
+    console.error("Error deleting ticket:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+
