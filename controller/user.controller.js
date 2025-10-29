@@ -182,3 +182,58 @@ exports.deleteUser = async (req, res) => {
     });
   }
 };
+
+exports.approveUser = async (req, res) => {
+  try {
+    const { empId } = req.params;
+
+    // Validate empId
+    if (!empId) {
+      return res.status(400).json({
+        success: false,
+        message: "Employee ID is required.",
+      });
+    }
+
+    // Find user by ID
+    const user = await User.findById(empId);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found.",
+      });
+    }
+
+    // Already approved?
+    if (user.userStatus === constant.userStatus.approved) {
+      return res.status(400).json({
+        success: false,
+        message: "Employee already approved.",
+      });
+    }
+
+    // Approve user
+    user.userStatus = constant.userStatus.approved;
+    await user.save();
+
+    // Response
+    return res.status(200).json({
+      success: true,
+      message: "User approved successfully.",
+      data: {
+        id: user._id || user.id,
+        name: user.name,
+        email: user.email,
+        userType: user.userType,
+        userStatus: user.userStatus,
+      },
+    });
+  } catch (error) {
+    console.error("Error approving user:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while approving user.",
+      error: error.message,
+    });
+  }
+};
