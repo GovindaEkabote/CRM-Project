@@ -1,6 +1,6 @@
 const Ticket = require("../models/ticket.model");
 const constant = require("../utils/constant");
-const User = require('../models/user.model')
+const User = require("../models/user.model");
 
 // Employee raises a new ticket..
 exports.createTicket = async (req, res) => {
@@ -141,6 +141,9 @@ exports.getTicketById = async (req, res) => {
 };
 
 // update ticket by id..
+/*
+ 1. update title and description
+*/
 exports.updateTicketById = async (req, res) => {
   try {
     const { ticketId } = req.params;
@@ -312,7 +315,9 @@ exports.assignTicket = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        message: `Ticket assigned to ${itSupportUser.fullName || itSupportUser.name}`,
+        message: `Ticket assigned to ${
+          itSupportUser.fullName || itSupportUser.name
+        }`,
         data: ticket,
       });
     }
@@ -351,3 +356,68 @@ exports.assignTicket = async (req, res) => {
   }
 };
 
+exports.updateTicketStatus = async (req, res) => {
+  try {
+    const { ticketId } = req.params;
+    const { status } = req.body;
+    const empId = req.user._id || req.user.id;
+    const role = req.user.userType;
+
+    // Validate incoming status
+    const validStatuses = [
+      constant.ticketStatus.OPEN,
+      constant.ticketStatus.IN_PROGRESS,
+      constant.ticketStatus.RESOLVED,
+      constant.ticketStatus.CLOSED,
+    ];
+    if (!validStatuses) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status value. Allowed: ${validStatuses.join(", ")}`,
+      });
+    }
+
+    // Find Ticket
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket not found.",
+      });
+    }
+    if (role === constant.userType.IT_SUPPORT) {
+      if (!ticket.assignee || ticket.assignee.toString() !== empId.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: "Access denied. You can only update your assigned tickets.",
+        });
+      }
+    } else if (role !== constant.userType.ADMIN) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only ADMIN or IT_SUPPORT can change status.",
+      });
+    }
+    // If resolving, mark resolvedAt
+    if (status === constant.ticketStatus.RESOLVED) {
+      ticket.resolvedAt = new Date();
+    }
+
+    // Update and save
+    ticket.status = status;
+    await ticket.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Ticket status updated to ${status}`,
+      data: ticket,
+    });
+  } catch (error) {
+    console.error("Error updating ticket status:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};

@@ -17,6 +17,7 @@ route.get("/ticket/:ticketId", verifyToken, Ticket.getTicketById);
 route.put("/ticket/:ticketId", verifyToken, Ticket.updateTicketById);
 route.delete("/ticket/:ticketId", verifyToken, Ticket.deleteTicket);
 route.put("/:ticketId/assign", verifyToken, Ticket.assignTicket);
+route.patch('/:ticketId/status',verifyToken,Ticket.updateTicketStatus)
 
 module.exports = route;
 
