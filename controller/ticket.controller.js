@@ -421,3 +421,6 @@ exports.updateTicketStatus = async (req, res) => {
     });
   }
 };
+
+// Add comments on tickets..
+
