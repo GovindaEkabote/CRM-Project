@@ -109,7 +109,7 @@ exports.deleteComment = async (req, res) => {
     const { id: userId, userType } = req.user;
 
     console.log(commentId);
-    
+
     const comment = await TicketComment.findById(commentId);
     if (!comment) {
       return res.status(404).json({
@@ -139,5 +139,49 @@ exports.deleteComment = async (req, res) => {
       success: false,
       message: "Internal server error",
     });
+  }
+};
+
+exports.updateComments = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const { id: userId, userType } = req.user;
+    const { text } = req.body;
+
+    if (!text || !text.trim().length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Comment text cannot be empty",
+      });
+    }
+    const comment = await TicketComment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: "Comments not found",
+      });
+    }
+    if (comment.user.toString() !== userId.toString()) {
+      return res.status(403).json({
+        success: false,
+        message: "You can only edit your own comments",
+      });
+    }
+    if (comment.text === text) {
+      return res.status(400).json({
+        success: false,
+        message: "New text is same as old text — nothing to update",
+      });
+    }
+    comment.text = text;
+    await comment.save();
+    return res.status(200).json({
+      success: true,
+      message: "Comment updated successfully",
+      data: comment,
+    });
+  } catch (error) {
+    console.error("Update Comment Error:", error);
+    return res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
