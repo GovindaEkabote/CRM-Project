@@ -5,16 +5,8 @@ const constant = require("../utils/constant");
 const { verifyToken, isAdmin } = require("../middlewares/authjwt");
 const authorizeRoles = require("../middlewares/authorizeRole");
 
-router.post("/ticket/comments/:ticketId", verifyToken, comment.addComment);
-router.get(
-  "/ticket/comments/:ticketId",
-  verifyToken,
-  authorizeRoles(
-    constant.userType.IT_SUPPORT ||
-    constant.userType.ADMIN ||
-    constant.userType.employee
-  ),
-  comment.getComments
-);
+router.post("/create/comments/:ticketId", verifyToken, comment.addComment);
+router.get("/get/comments/:ticketId", verifyToken, comment.getComments);
+router.delete("/delete/comments/:commentId", verifyToken, comment.deleteComment);
 
 module.exports = router;

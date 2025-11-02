@@ -72,6 +72,19 @@ exports.getComments = async (req, res) => {
       });
     }
 
+    if (
+      !(
+        role === constant.userType.ADMIN ||
+        role === constant.userType.IT_SUPPORT ||
+        ticket.reporter.toString() === userId.toString()
+      )
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to view comments.",
+      });
+    }
+
     const comments = await TicketComment.find({ ticket: ticketId })
       .populate("user", "fullName email userType")
       .sort({ createdAt: 1 });
@@ -86,6 +99,45 @@ exports.getComments = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Server Error",
+    });
+  }
+};
+
+exports.deleteComment = async (req, res) => {
+  try {
+    const { commentId } = req.params;
+    const { id: userId, userType } = req.user;
+
+    console.log(commentId);
+    
+    const comment = await TicketComment.findById(commentId);
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: "comments not found",
+      });
+    }
+    if (
+      comment.user.toString() !== userId.toString() &&
+      userType !== constant.userType.ADMIN
+    ) {
+      return res.status(404).json({
+        success: false,
+        message:
+          "Yoc can only delete your own comments unless you are an Admin",
+      });
+    }
+
+    await comment.deleteOne();
+    return res.status(200).json({
+      success: true,
+      message: "Comment deleted successfully",
+    });
+  } catch (error) {
+    console.log("Delete Comments Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
     });
   }
 };
