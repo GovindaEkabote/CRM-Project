@@ -182,6 +182,29 @@ exports.updateComments = async (req, res) => {
     });
   } catch (error) {
     console.error("Update Comment Error:", error);
-    return res.status(500).json({ success: false, message: "Internal server error" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
+
+exports.getMyComments = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const comments = await TicketComment.find({ user: userId })
+      .populate("ticket", "title status")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      count: comments.length,
+      data: comments,
+    });
+  } catch (error) {
+    console.error("Get My Comments Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
   }
 };

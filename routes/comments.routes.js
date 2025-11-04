@@ -9,5 +9,6 @@ router.post("/create/comments/:ticketId", verifyToken, comment.addComment);
 router.get("/get/comments/:ticketId", verifyToken, comment.getComments);
 router.delete("/delete/comments/:commentId", verifyToken, comment.deleteComment);
 router.put("/update/comments/:commentId", verifyToken, comment.updateComments);
+router.get("/get/my-comments", verifyToken, comment.getMyComments);
 
 module.exports = router;
