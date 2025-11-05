@@ -1,5 +1,6 @@
 const Ticket = require("../models/ticket.model");
 const constant = require("../utils/constant");
+const paginate = require("../utils/pagination");
 const User = require("../models/user.model");
 
 // Employee raises a new ticket..
@@ -422,5 +423,59 @@ exports.updateTicketStatus = async (req, res) => {
   }
 };
 
-// Add comments on tickets..
+// filter Tickets..
+exports.filterTickets = async (req, res) => {
+  try {
+    const role = req.user?.userType?.toUpperCase();
+    const userId = req.user?._id;
+    
+    if (![constant.userType.ADMIN, constant.userType.IT_SUPPORT].includes(role)) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only Admin & IT Support can filter tickets."
+      });
+    }
 
+    const { status, priority, assignee, page = 1, limit = 10 } = req.query;
+
+    const query = {};
+
+    if (status) query.status = status.toUpperCase();
+    if (priority) query.ticketPriority = priority.toUpperCase();
+
+    if (role === constant.userType.ADMIN && assignee) {
+      query.assignee = assignee;
+    }
+
+    if (role === constant.userType.IT_SUPPORT) {
+      query.$or = [{ assignee: userId }, { assignee: null }];
+    }
+
+    const result = await paginate(Ticket, query, {
+      page,
+      limit,
+      sort: { createdAt: -1 },
+      select: "",
+    });
+
+    // Populate manually after pagination fetch
+    await Ticket.populate(result.data, [
+      { path: "reporter", select: "fullName email empId" },
+      { path: "assignee", select: "fullName email empId" },
+    ]);
+
+    return res.status(200).json({
+      success: true,
+      pagination: result.pagination,
+      data: result.data,
+    });
+
+  } catch (error) {
+    console.error("FILTER TICKETS ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};

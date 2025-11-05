@@ -17,10 +17,10 @@ route.get("/ticket/:ticketId", verifyToken, Ticket.getTicketById);
 route.put("/ticket/:ticketId", verifyToken, Ticket.updateTicketById);
 route.delete("/ticket/:ticketId", verifyToken, Ticket.deleteTicket);
 route.put("/:ticketId/assign", verifyToken, Ticket.assignTicket);
-route.patch('/:ticketId/status',verifyToken,Ticket.updateTicketStatus)
+route.patch("/:ticketId/status", verifyToken, Ticket.updateTicketStatus);
+route.get("/filter/ticket", verifyToken, Ticket.filterTickets);
 
 module.exports = route;
-
 
 // https://chatgpt.com/c/68f6ccca-4290-8320-a20a-6820e5c643a0
 // https://chatgpt.com/c/68fc9e7c-f8fc-8322-8a43-4a3281bf6bed

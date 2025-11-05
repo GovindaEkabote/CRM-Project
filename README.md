@@ -38,23 +38,23 @@ Each module (user, ticket, auth, etc.) is isolated for better maintainability an
 | **Containerization** | Docker (optional)                        |
 
 # ⚙️ Environment Variables
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/helpdesk
-SECRET=your_jwt_secret
-EXPIRES_IN=1d
-REFRESH_SECRET=your_refresh_secret
-REFRESH_EXPIRES_IN=7d
+1. PORT=5000
+2. MONGODB_URI=mongodb://localhost:27017/helpdesk
+3. SECRET=your_jwt_secret
+4. EXPIRES_IN=1d
+5. REFRESH_SECRET=your_refresh_secret
+6. REFRESH_EXPIRES_IN=7d
    
 # 🧠 Installation & Setup
-1️⃣ Clone the Repository:- 
+1. Clone the Repository:- 
     https://github.com/GovindaEkabote/CRM-Project.git
-2️⃣ Install Dependencies
+2. Install Dependencies
     npm install
-3️⃣ Configure Environment
+3. Configure Environment
     Create a .env file with your environment variables (see above). 
-4️⃣ Run the Application
+4. Run the Application
     node index.js or nodemon index.js
-5️⃣ Access the App
+5. Access the App
     http://localhost:5000
 
 # 🧪 Testing
@@ -64,4 +64,5 @@ You can import the API collection provided in the /docs folder (if created).
 # 🧑‍💻 Author
 Govinda Ekbote
 Backend Developer | Node.js | Express.js | MongoDB
-🔗 LinkedIn  • GitHub
+1. LinkedIn - https://www.linkedin.com/in/govinda-07/
+2. GitHub - https://github.com/GovindaEkabote
