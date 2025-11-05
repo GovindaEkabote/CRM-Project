@@ -66,8 +66,8 @@ exports.getAllTickets = async (req, res) => {
     console.log("APPLIED FILTER:", filter);
 
     const tickets = await Ticket.find(filter)
-      .populate("reporter", "fullName email")
-      .populate("assignee", "fullName email")
+      .populate("reporter", "name email")
+      .populate("assignee", "name email")
       .sort({ createdAt: -1 });
 
     return res.status(200).json({
@@ -92,8 +92,8 @@ exports.getTicketById = async (req, res) => {
     const empId = req.user.id || req.user._id;
     const role = req.user.userType;
     const ticket = await Ticket.findById(ticketId)
-      .populate("reporter", "fullName email empId")
-      .populate("assignee", "fullName email empId");
+      .populate("reporter", "name email empId")
+      .populate("assignee", "name email empId");
     if (!ticket) {
       return res.status(404).json({
         success: false,
@@ -317,7 +317,7 @@ exports.assignTicket = async (req, res) => {
       return res.status(200).json({
         success: true,
         message: `Ticket assigned to ${
-          itSupportUser.fullName || itSupportUser.name
+          itSupportUser.name || itSupportUser.name
         }`,
         data: ticket,
       });
@@ -460,8 +460,8 @@ exports.filterTickets = async (req, res) => {
 
     // Populate manually after pagination fetch
     await Ticket.populate(result.data, [
-      { path: "reporter", select: "fullName email empId" },
-      { path: "assignee", select: "fullName email empId" },
+      { path: "reporter", select: "name email empId" },
+      { path: "assignee", select: "name email empId" },
     ]);
 
     return res.status(200).json({
