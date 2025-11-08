@@ -26,9 +26,10 @@ GET /api/v1/tickets/status?startDate=2025-10-01&endDate=2025-10-31
 GET /api/v1/tickets/status?category=Access%20Issue
 GET /api/v1/tickets/status?assignee=68fcf0e63242bdeca819884c
 GET /api/v1/tickets/status?status=RESOLVED
-
-
 */
+
+route.patch("/tickets/:ticketId/reassign",verifyToken, Ticket.reassignTicket)
+
 
 module.exports = route;
 

@@ -24,4 +24,5 @@ route.delete("/delete/:empId", verifyToken, isAdmin, Users.deleteUser);
 
 route.put("/:empId/approve", verifyToken, isAdmin, Users.approveUser);
 
+
 module.exports = route;

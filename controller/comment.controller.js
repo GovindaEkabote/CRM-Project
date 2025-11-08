@@ -86,7 +86,7 @@ exports.getComments = async (req, res) => {
     }
 
     const comments = await TicketComment.find({ ticket: ticketId })
-      .populate("user", "fullName email userType")
+      .populate("user", "name email userType")
       .sort({ createdAt: 1 });
 
     return res.status(200).json({

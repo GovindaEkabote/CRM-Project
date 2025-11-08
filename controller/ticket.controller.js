@@ -585,3 +585,60 @@ exports.ticketStatistics = async (req, res) => {
   }
 };
 
+// Reassign Ticket -- Admin Only..
+exports.reassignTicket = async (req, res) => {
+  try {
+    const role = req.user.userType;
+    if (role !== constant.userType.ADMIN) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only ADMIN can reassign tickets.",
+      });
+    }
+
+    const { ticketId } = req.params;
+    const { assignedTo } = req.body;
+
+    if (!assignedTo) {
+      return res.status(400).json({
+        success: false,
+        message: "New assigned user ID (assignedTo) is required.",
+      });
+    }
+
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      return res.status(404).json({ success: false, message: "Ticket not found." });
+    }
+
+    if (ticket.status !== constant.ticketStatus.OPEN) {
+      return res.status(400).json({
+        success: false,
+        message: `Only OPEN tickets can be reassigned. Current status: ${ticket.status}`,
+      });
+    }
+
+    const newAssignee = await User.findById(assignedTo);
+    if (!newAssignee) {
+      return res.status(404).json({ success: false, message: "New assignee not found." });
+    }
+
+    ticket.assignedTo = assignedTo;
+    ticket.updatedAt = new Date();
+    await ticket.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Ticket reassigned successfully.",
+      data: ticket,
+    });
+  } catch (error) {
+    console.error("Error reassigning ticket:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      error: error.message,
+    });
+  }
+};
+
