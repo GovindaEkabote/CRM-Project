@@ -1,0 +1,781 @@
+{
+	"info": {
+		"_postman_id": "eb114cc2-e495-4463-a8c4-8caa4d793229",
+		"name": "CRM- IT Help Desk Man..",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "30812459"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login ",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"empId\": \"EMP104\",\r\n    \"password\": \"Ravi@123\"\r\n}\r\n\r\n// {\r\n//     \"empId\": \"ADMIN001\",\r\n//     \"password\": \"Admin@123\"\r\n// }\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/auth/login",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Signup",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Kunal Patil\",\r\n    \"empId\":\"104\",\r\n    \"email\":\"kunalPatil@123.gmail\",\r\n    \"password\":\"kunalPatil@123.gmail\",\r\n    \"userType\":\"IT_SUPPORT\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/auth/signup",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"auth",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/auth/logout",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/auth/refresh",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "approve it support staff",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/6901af9240125d62fdad4cc3/approve",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"6901af9240125d62fdad4cc3",
+								"approve"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Get All Users",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/users",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get loggedin user profile",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/me",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Profile By ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/employee/68f46ccbb949b832f980c8db",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"employee",
+								"68f46ccbb949b832f980c8db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Employee",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/delete/68f46ccbb949b832f980c8db",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"delete",
+								"68f46ccbb949b832f980c8db"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Profile",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/employee/update/:userId",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"employee",
+								"update",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Ticket",
+			"item": [
+				{
+					"name": "Create Ticket",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"title\": \"Java Install\",\r\n  \"description\": \"Please Install Java on my system ASAP.\",\r\n  \"ticketPriority\": \"HIGH\",\r\n  \"category\": \"Access Issue\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/create/ticket",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"create",
+								"ticket"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Admin Ticket Assign",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assignId\":\"68f3c779d653fff884613341\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/6901b66e8dbb81396b381ff8/assign",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"6901b66e8dbb81396b381ff8",
+								"assign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Ticket Status",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\":\"RESOLVED\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/6901b66e8dbb81396b381ff8/status",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"6901b66e8dbb81396b381ff8",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Filter Ticket",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/filter/ticket?status=RESOLVED&priority=LOW",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"filter",
+								"ticket"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "RESOLVED"
+								},
+								{
+									"key": "priority",
+									"value": "LOW"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Tickets ",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/tickets",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"tickets"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Ticket by ID",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/ticket/6901b66e8dbb81396b381ff8",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"ticket",
+								"6901b66e8dbb81396b381ff8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete ticket by id",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/ticket/6901b66e8dbb81396b381ff8",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"ticket",
+								"6901b66e8dbb81396b381ff8"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Ticket",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/status?status=RESOLVED",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"status"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "RESOLVED"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reassign Ticket",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"assignedTo\":\"68f3c779d653fff884613341\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/tickets/6901b66e8dbb81396b381ff8/reassign",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"tickets",
+								"6901b66e8dbb81396b381ff8",
+								"reassign"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Force To close Ticket",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/6901b66e8dbb81396b381ff8/close",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"6901b66e8dbb81396b381ff8",
+								"close"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "Create New Comments",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"comment\": \"We are working on this issue.\"\r\n}\r\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/create/comments/68febaad9c4d795f003b15eb",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"create",
+								"comments",
+								"68febaad9c4d795f003b15eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all your comments  ",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/get/comments/68febaad9c4d795f003b15eb",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"get",
+								"comments",
+								"68febaad9c4d795f003b15eb"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Either you or Admin delete your comments",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/delete/comments/69079342268e1cf783d18663",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"delete",
+								"comments",
+								"69079342268e1cf783d18663"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "my-comments",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/get/my-comments",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"get",
+								"my-comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update comments",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"text\":\"We are working on this issue. it's done\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseURL}}/hrm/api/v1/update/comments/69077eb881864413ee019c9d",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"hrm",
+								"api",
+								"v1",
+								"update",
+								"comments",
+								"69077eb881864413ee019c9d"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
+		}
+	]
+}
