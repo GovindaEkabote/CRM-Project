@@ -423,16 +423,25 @@ exports.updateTicketStatus = async (req, res) => {
   }
 };
 
+/*
+ `status`        -> Filter by ticket status (`OPEN`, `IN_PROGRESS`, etc)     
+ `priority`      -> Filter by priority (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`) 
+ `assignee`      -> Filter tickets assigned to a particular IT support user  
+ `page`, `limit` -> Pagination                                               
+*/
+
 // filter Tickets..
 exports.filterTickets = async (req, res) => {
   try {
     const role = req.user?.userType?.toUpperCase();
-    const userId = req.user?._id;
-    
-    if (![constant.userType.ADMIN, constant.userType.IT_SUPPORT].includes(role)) {
+    const userId = req.user?._id || req.user.id;
+
+    if (
+      ![constant.userType.ADMIN, constant.userType.IT_SUPPORT].includes(role)
+    ) {
       return res.status(403).json({
         success: false,
-        message: "Access denied. Only Admin & IT Support can filter tickets."
+        message: "Access denied. Only Admin & IT Support can filter tickets.",
       });
     }
 
@@ -469,7 +478,6 @@ exports.filterTickets = async (req, res) => {
       pagination: result.pagination,
       data: result.data,
     });
-
   } catch (error) {
     console.error("FILTER TICKETS ERROR:", error);
     return res.status(500).json({
@@ -479,3 +487,101 @@ exports.filterTickets = async (req, res) => {
     });
   }
 };
+
+// Ticket Statistics
+exports.ticketStatistics = async (req, res) => {
+  try {
+    const role = req.user.userType;
+    if (role !== constant.userType.ADMIN) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only ADMIN can view ticket statistics.",
+      });
+    }
+
+    // Extract filters from query params
+    const { startDate, endDate, category, assignee, status } = req.query;
+    const matchFilter = {};
+
+    // Date range filter
+    if (startDate || endDate) {
+      matchFilter.createdAt = {};
+      if (startDate) matchFilter.createdAt.$gte = new Date(startDate);
+      if (endDate) matchFilter.createdAt.$lte = new Date(endDate);
+    }
+
+    // Optional filters
+    if (category) matchFilter.category = category;
+    if (assignee) matchFilter.assignee = new mongoose.Types.ObjectId(assignee);
+    if (status) matchFilter.status = status.toUpperCase();
+
+    // Count by status
+    const statusCount = await Ticket.aggregate([
+      { $match: matchFilter },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+    ]);
+
+    const stats = {
+      OPEN: 0,
+      IN_PROGRESS: 0,
+      RESOLVED: 0,
+      CLOSED: 0,
+    };
+
+    statusCount.forEach((s) => {
+      stats[s._id.toUpperCase()] = s.count;
+    });
+
+    // Average resolution time (in hours)
+    const avgResolution = await Ticket.aggregate([
+      {
+        $match: {
+          ...matchFilter,
+          status: { $in: ["RESOLVED", "CLOSED"] },
+          resolvedAt: { $exists: true, $ne: null },
+        },
+      },
+      {
+        $project: {
+          resolutionTime: {
+            $divide: [
+              { $subtract: ["$resolvedAt", "$createdAt"] },
+              1000 * 60 * 60, // ms → hours
+            ],
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          avgResolution: { $avg: "$resolutionTime" },
+        },
+      },
+    ]);
+
+    const avgResolutionTime =
+      avgResolution.length > 0
+        ? Number(avgResolution[0].avgResolution.toFixed(2))
+        : 0;
+
+    return res.status(200).json({
+      success: true,
+      message: "Ticket statistics fetched successfully.",
+      filtersApplied: matchFilter,
+      data: {
+        totalTickets:
+          stats.OPEN + stats.IN_PROGRESS + stats.RESOLVED + stats.CLOSED,
+        ...stats,
+        avgResolutionTimeHours: avgResolutionTime,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching ticket stats:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error while fetching ticket statistics.",
+      error: error.message,
+    });
+  }
+};
+
