@@ -608,7 +608,9 @@ exports.reassignTicket = async (req, res) => {
 
     const ticket = await Ticket.findById(ticketId);
     if (!ticket) {
-      return res.status(404).json({ success: false, message: "Ticket not found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "Ticket not found." });
     }
 
     if (ticket.status !== constant.ticketStatus.OPEN) {
@@ -620,7 +622,9 @@ exports.reassignTicket = async (req, res) => {
 
     const newAssignee = await User.findById(assignedTo);
     if (!newAssignee) {
-      return res.status(404).json({ success: false, message: "New assignee not found." });
+      return res
+        .status(404)
+        .json({ success: false, message: "New assignee not found." });
     }
 
     ticket.assignedTo = assignedTo;
@@ -642,3 +646,40 @@ exports.reassignTicket = async (req, res) => {
   }
 };
 
+// force close any ticket..
+exports.forceCloseTicket = async (req, res) => {
+  try {
+    const role = req.user.userType;
+    if (role !== constant.userType.ADMIN) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied. Only ADMIN can close tickets.",
+      });
+    }
+
+    const { ticketId } = req.params;
+    const ticket = await Ticket.findById(ticketId);
+    if (!ticket) {
+      return res.status(404).json({
+        success: false,
+        message: "Ticket not found.",
+      });
+    }
+    ticket.status = constant.ticketStatus.CLOSED;
+    ticket.resolvedAt = new Date();
+    await ticket.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Ticket force-closed successfully.",
+      data: ticket,
+    });
+  } catch (error) {
+    console.error("Error force-closing ticket:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+      error: error.message,
+    });
+  }
+};

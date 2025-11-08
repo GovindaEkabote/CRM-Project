@@ -29,11 +29,8 @@ GET /api/v1/tickets/status?status=RESOLVED
 */
 
 route.patch("/tickets/:ticketId/reassign",verifyToken, Ticket.reassignTicket)
+route.patch("/:ticketId/close",verifyToken, Ticket.forceCloseTicket)
 
 
 module.exports = route;
 
-// https://chatgpt.com/c/68f6ccca-4290-8320-a20a-6820e5c643a0
-// https://chatgpt.com/c/68fc9e7c-f8fc-8322-8a43-4a3281bf6bed
-
-// https://chatgpt.com/c/68ff1f8c-1ecc-8323-9f6b-9e1b614c7770
